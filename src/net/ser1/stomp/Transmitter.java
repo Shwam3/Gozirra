@@ -1,35 +1,27 @@
 package net.ser1.stomp;
 
-import java.util.Map;
-import java.util.Iterator;
-import java.io.OutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
+import java.util.Map;
 
-/**
- * (c)2005 Sean Russell
- */
-class Transmitter {
-  public static void transmit( Command c, Map h, String b, 
-      java.io.OutputStream out ) throws IOException {
-    StringBuffer message = new StringBuffer( c.toString() );
-    message.append( "\n" );
+class Transmitter
+{
+    public static void transmit(Command command, Map<String, String> header, String body, OutputStream out) throws IOException
+    {
+        StringBuilder message = new StringBuilder(command.toString());
+        message.append("\n");
 
-    if (h != null) {
-      for (Iterator keys = h.keySet().iterator(); keys.hasNext(); ) {
-        String key = (String)keys.next();
-        String value = (String)h.get(key);
-        message.append( key );
-        message.append( ":" );
-        message.append( value );
-        message.append( "\n" );
-      }
+        if (header != null)
+            for (String key : header.keySet())
+                message.append(key).append(":").append(header.get(key)).append("\n");
+
+        message.append("\n");
+
+        if (body != null)
+            message.append(body);
+
+        message.append("\000");
+
+        out.write(message.toString().getBytes(Command.ENCODING));
     }
-    message.append( "\n" );
-
-    if (b != null) message.append( b );
-
-    message.append( "\000" );
-
-    out.write( message.toString().getBytes( Command.ENCODING ) );
-  }
 }

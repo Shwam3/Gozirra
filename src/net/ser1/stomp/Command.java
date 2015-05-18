@@ -1,51 +1,43 @@
 package net.ser1.stomp;
 
-import java.io.OutputStream;
-import java.io.IOException;
+public enum Command
+{
+    ABORT       ("ABORT"),
+    ACK         ("ACK"),
+    BEGIN       ("BEGIN"),
+    COMMIT      ("COMMIT"),
+    CONNECT     ("CONNECT"),
+    DISCONNECT  ("DISCONNECT"),
+    NACK        ("NACK"),
+    SEND        ("SEND"),
+    SUBSCRIBE   ("SUBSCRIBE"),
+    UNSUBSCRIBE ("UNSUBSCRIBE"),
 
-/**
- * (c)2005 Sean Russell
- */
-public class Command {
-  public final static String ENCODING = "US-ASCII";
-  private String _command;
+    CONNECTED   ("CONNECTED"),
+    ERROR       ("ERROR"),
+    MESSAGE     ("MESSAGE"),
+    RECEIPT     ("RECEIPT");
 
-  private Command( String msg ) { 
-    _command = msg;
-  }
-  public static Command SEND = new Command( "SEND" ),
-         SUBSCRIBE = new Command( "SUBSCRIBE" ),
-         UNSUBSCRIBE = new Command( "UNSUBSCRIBE" ),
-         BEGIN = new Command( "BEGIN" ),
-         COMMIT = new Command( "COMMIT" ),
-         ABORT = new Command( "ABORT" ),
-         DISCONNECT = new Command( "DISCONNECT" ),
-         CONNECT = new Command( "CONNECT" );
+    public  final static String ENCODING = "UTF-8";
+    private final        String command;
 
-  public static Command MESSAGE = new Command( "MESSAGE" ),
-         RECEIPT = new Command( "RECEIPT" ),
-         CONNECTED = new Command( "CONNECTED" ),
-         ERROR = new Command( "ERROR" );
+    private Command(String commandName)
+    {
+        command = commandName;
+    }
 
-  public static Command valueOf( String v ) {
-    v = v.trim();
-    if (v.equals("SEND")) return SEND;
-    else if (v.equals( "SUBSCRIBE" )) return SUBSCRIBE;
-    else if (v.equals( "UNSUBSCRIBE" )) return UNSUBSCRIBE;
-    else if (v.equals( "BEGIN" )) return BEGIN;
-    else if (v.equals( "COMMIT" )) return COMMIT;
-    else if (v.equals( "ABORT" )) return ABORT;
-    else if (v.equals( "CONNECT" )) return CONNECT;
-    else if (v.equals( "MESSAGE" )) return MESSAGE;
-    else if (v.equals( "RECEIPT" )) return RECEIPT;
-    else if (v.equals( "CONNECTED" )) return CONNECTED;
-    else if (v.equals( "DISCONNECT" )) return DISCONNECT;
-    else if (v.equals( "ERROR" )) return ERROR;
-    throw new Error( "Unrecognised command "+v );
-  }
+    public static Command getCommand(String command)
+    {
+        for (Command cmd : values())
+            if (cmd.name().equalsIgnoreCase(command.trim()))
+                return cmd;
 
-  public String toString() {
-    return _command;
-  }
+        throw new Error("Unrecognised command: " + command.trim());
+    }
+
+    @Override
+    public String toString()
+    {
+        return command;
+    }
 }
-

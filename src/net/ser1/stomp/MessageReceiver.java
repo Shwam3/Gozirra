@@ -5,8 +5,9 @@ import java.util.Map;
 /**
  * (c)2005 Sean Russell
  */
-public interface MessageReceiver {
-  public void receive( Command c, Map h, String b );
-  public void disconnect();
-  public boolean isClosed();
+public interface MessageReceiver
+{
+    public void receive(Command command, Map<String, String> header, String body);
+    public void disconnect();
+    public boolean isClosed();
 }
