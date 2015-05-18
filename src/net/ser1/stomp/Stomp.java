@@ -16,9 +16,6 @@ import java.util.Stack;
  * a queue and can be retrieved with getNext(). In all cases, when
  * messages are retrieved, they are deleted from the queue.
  *
- * Notes:
- * * FIXME: ERROR messages don't do anything.
- *
  * (c)2005 Sean Russell
  */
 public abstract class Stomp
@@ -29,14 +26,18 @@ public abstract class Stomp
     private final Map<String, List<Listener>> channelListeners = new HashMap<>();
 
     /**
-     * Things that are listening for communication errors. Contains
-     * Listeners.
+     * Things that are listening for communication errors. Contains Listeners.
      */
     private final List<Listener> errorListeners = new ArrayList<>();
 
     /**
-     * A message queue; where messages that have no listeners are
-     * stored. Contains Messages.
+     * Things that are listening for heartbeats. Contains Listeners.
+     */
+    private final List<Listener> heartbeatListeners = new ArrayList<>();
+
+    /**
+     * A message queue; where messages that have no listeners are stored.
+     * Contains Messages.
      */
     private final Stack<Message> messageQueue = new Stack<>();
 
@@ -499,6 +500,22 @@ public abstract class Stomp
         }
     }
 
+    public void addHeartbeatListener(Listener listener)
+    {
+        synchronized (heartbeatListeners)
+        {
+            heartbeatListeners.add(listener);
+        }
+    }
+
+    public void removeHeartbeatListener(Listener listener)
+    {
+        synchronized (heartbeatListeners)
+        {
+            heartbeatListeners.remove(listener);
+        }
+    }
+
     /**
      * Checks to see if a receipt has come in.
      *
@@ -628,6 +645,20 @@ public abstract class Stomp
                 synchronized(errorList)
                 {
                     errorList.add(body);
+                }
+            }
+        }
+        else if (command == Command.HEARTBEAT)
+        {
+            synchronized (heartbeatListeners)
+            {
+                for (Listener listener : heartbeatListeners)
+                {
+                    try
+                    {
+                        listener.message(new HashMap<>(), null);
+                    }
+                    catch (Exception e) { e.printStackTrace(); /* Don't let listeners screw us over by throwing exceptions */ }
                 }
             }
         }

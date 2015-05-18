@@ -16,7 +16,8 @@ public enum Command
     CONNECTED   ("CONNECTED"),
     ERROR       ("ERROR"),
     MESSAGE     ("MESSAGE"),
-    RECEIPT     ("RECEIPT");
+    RECEIPT     ("RECEIPT"),
+    HEARTBEAT   ("");
 
     public  final static String ENCODING = "UTF-8";
     private final        String command;

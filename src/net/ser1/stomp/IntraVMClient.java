@@ -1,7 +1,6 @@
 package net.ser1.stomp;
 
 import java.util.Map;
-import java.util.Iterator;
 
 /**
  * A client that is connected directly to a server.  Messages sent via
@@ -11,44 +10,52 @@ import java.util.Iterator;
  *
  * (c)2005 Sean Russell
  */
-public class IntraVMClient extends Stomp implements Listener, Authenticatable {
-  private Server _server;
+public class IntraVMClient extends Stomp implements Listener, Authenticatable
+{
+    private Server server;
 
-  protected IntraVMClient( Server server ) {
-    _server = server;
-    _connected = true;
-  }
+    protected IntraVMClient(Server server)
+    {
+        this.server = server;
+        connected = true;
+    }
 
-  public boolean isClosed() { return false; }
+    public boolean isClosed()
+    {
+        return false;
+    }
 
+    public Object token()
+    {
+        return "IntraVMClient";
+    }
 
-  public Object token() {
-    return "IntraVMClient";
-  }
+    /**
+     * Transmit a message to clients and listeners.
+     */
+    public void transmit(Command c, Map<String, String> h, String b)
+    {
+        server.receive(c, h, b, this);
+    }
 
+    public void disconnect(Map<String, String> h)
+    {
+        server.receive(Command.DISCONNECT, null, null, this);
+        server = null;
+    }
 
-  /**
-   * Transmit a message to clients and listeners.  
-   */
-  public void transmit( Command c, Map h, String b ) {
-    _server.receive( c, h, b, this );
-  }
+    public void message(Map<String, String> headers, String body)
+    {
+        receive(Command.MESSAGE, headers, body);
+    }
 
+    public void receipt(Map<String, String> headers)
+    {
+        receive(Command.RECEIPT, headers, null);
+    }
 
-  public void disconnect( Map h ) { 
-    _server.receive( Command.DISCONNECT, null, null, this );
-    _server = null;
-  }
-
-  public void message( Map headers, String body ) {
-    receive( Command.MESSAGE, headers, body );
-  }
-
-  public void receipt( Map headers ) {
-    receive( Command.RECEIPT, headers, null );
-  }
-
-  public void error( Map headers, String body ) {
-    receive( Command.ERROR, headers, body );
-  }
+    public void error(Map<String, String> headers, String body)
+    {
+        receive(Command.ERROR, headers, body);
+    }
 }
